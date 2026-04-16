@@ -1,0 +1,203 @@
+---
+title: "table generation"
+format: html
+---
+
+This document creates the tables in the respective folders. Code can be reexecuted if baseline data changes
+
+```{r}
+#| label: Setup
+#| message: false
+#| warning: false
+library(tidyverse)
+library(melidosData)
+library(gt)
+library(LightLogR)
+library(gtsummary)
+library(rlang)
+source("helpers.R")
+source("table.R")
+source("time_summaries.R")
+```
+
+## Demographics
+
+```{r}
+#| warning: false
+demographics <- load_data("demographics") |> flatten_data()
+table_all_sites(demographics, "Demographics")
+```
+
+## Sleep
+
+```{r}
+#| warning: false
+sleep <- load_data("sleepdiaries") |> flatten_data()
+table_all_sites(
+  sleep |> 
+    mutate(across(where(is.POSIXct), \(x) {
+       date(x) <- as.Date("2000-01-02")
+       x
+    })) |> add_labels(sleep |> extract_labels()),
+  "Morning sleep diary",
+               other_arguments = 
+                 list(
+                   statistic = list(all_continuous() ~ "{median} ({p25}, {p75})",
+                                 all_categorical() ~ "{n} ({p}%)",
+                                 c(bedtime, sleep, sleepprep)  ~ "{time_median} ({nighttime_p25}, {nighttime_p75})",
+                                 c(wake, out_ofbed)  ~ "{time_median} ({daytime_p25}, {daytime_p75})"
+                                   ),
+                    type = c(awakenings, awake_duration) ~ "continuous"
+                 )
+)
+```
+
+## Chronotype
+
+```{r}
+#| message: false
+#| warning: false
+ct <- load_data("chronotype") |> flatten_data()
+table_all_sites(
+  ct|> 
+    mutate(sjl = sjl |> as.duration(),
+           across(c(so_w, so_f, msw, msf, msf_sc), \(x) paste("2000-01-01", x) |> parse_datetime())) |> 
+    mutate(across(where(is.duration), \(x) as.difftime(x, units = "hours")/3600),
+         outdoor = outdoor |> as.difftime(units = "mins")) |> 
+    relocate(meq_type, meq, msf_sc, sjl, .after = Id) |> 
+    add_labels(ct |> extract_labels()), 
+               "Chronotype",
+               other_arguments = 
+                 list(
+                statistic = list(all_continuous() ~ "{median} ({p25}, {p75})",
+                                 all_categorical() ~ "{n} ({p}%)",
+                                 c(so_w, so_f, msw, msf, msf_sc)  ~ "{time_median} ({nighttime_p25}, {nighttime_p75})"
+                ),
+                type = c(sjl, outdoor, sd_w, sd_f, msw, msf, so_w, so_f, meq, sd_week) ~ "continuous"
+                 )
+)
+```
+
+## Wear log
+
+```{r}
+#| message: false
+#| warning: false
+wearlog <- load_data("wearlog") |> flatten_data()
+table_all_sites(wearlog, "Wear log",
+                non_columns = c("start", "end", "wearlog_event", "wearlog_place", "wearlog_place_english", "radius"))
+```
+
+## Wellbeing diary
+
+```{r}
+#| message: false
+#| warning: false
+wellbeing <- load_data("wellbeingdiary") |> flatten_data()
+table_all_sites(wellbeing, "Wellbeing diary (WHO-5)",
+                non_columns = c("Date", "startdate_2", "who5_raw"))
+```
+
+## Exercise diary
+
+```{r}
+#| message: false
+#| warning: false
+exercise <- load_data("exercisediary") |> flatten_data()
+table_all_sites(exercise, "Exercise diary",
+                non_columns = c("type", "type_english", "startdate_3", "enddate_3", "Date", "instructions"))
+```
+
+## Light exposure & activity diary
+
+```{r}
+#| message: false
+#| warning: false
+mHLEA <- load_data("lightexposurediary") |> flatten_data()
+table_all_sites(mHLEA, "Light exposure (mH-LEA) & exercise diary",
+                non_columns = c("start", "end", "Date", "activity_desc", "activity_desc_english", "startdate"))
+```
+
+## Current conditions
+
+```{r}
+#| message: false
+#| warning: false
+curcon <- load_data("currentconditions") |> flatten_data()
+table_all_sites(
+  curcon |> mutate(across(anxious:kss, as.numeric))|> 
+    add_labels(curcon |> extract_labels()), 
+                "Current conditions (EMA)",
+                non_columns = c("Datetime", "enddate_4"),
+                other_arguments = list(type = anxious:kss ~ "continuous"))
+```
+
+## LEBA
+
+```{r}
+#| message: false
+#| warning: false
+leba <- load_data("leba") |> flatten_data()
+table_all_sites(
+  leba |> mutate(across(leba_f2_04:last_col(), as.numeric))|> 
+    add_labels(leba |> extract_labels()), 
+                "Light exposure-related behavior (LEBA)",
+                other_arguments = list(type = everything() ~ "continuous"))
+```
+
+## VLSQ8
+
+```{r}
+#| message: false
+#| warning: false
+vlsq8 <- load_data("vlsq8") |> flatten_data()
+table_all_sites(
+  vlsq8, 
+  "Light sensitivity (VLSQ-8)")
+```
+
+## ASE
+
+```{r}
+#| message: false
+#| warning: false
+ase <- load_data("ase") |> flatten_data()
+table_all_sites(
+  ase, 
+  "Assessment of sleep environment (ASE)")
+```
+
+## Acceptability
+
+```{r}
+#| message: false
+#| warning: false
+acceptability <- load_data("acceptability") |> flatten_data()
+table_all_sites(
+  acceptability, 
+  "Acceptability of wearing the device")
+```
+
+## Lifestyle and health
+
+```{r}
+#| message: false
+#| warning: false
+health <- load_data("health") |> flatten_data()
+table_all_sites(
+  health, 
+  "Lifestyle & health", non_columns = "medication_type")
+```
+
+## Experience log
+
+```{r}
+#| message: false
+#| warning: false
+experience <- load_data("experiencelog") |> flatten_data()
+table_all_sites(
+  experience |> select(-ends_with("english")), 
+  "Experience log", 
+  non_columns = c("Datetime", "is_past", "loc_spec", "descr", "identity_spec", "future_use"))
+```
+
