@@ -48,10 +48,10 @@ site_conv_gt <- function(table, after = "Overall", rev = FALSE){
   
   table |> 
     cols_label_with(
-      columns = matches(names(melidos_cities)),
+      columns = any_of(names(melidos_cities)),
       fn = site_conversion
     ) |> 
-    cols_move(melidos_order, after = after)
+    cols_move(any_of(melidos_order), after = after)
 }
 
 gt_multiple <- function(table, names, fun){
@@ -71,4 +71,10 @@ style_tab <- function(table, column) {
                   alpha = 0.05)),
       locations = cells_body(any_of(column))
     )
+}
+
+merge_desc_columns <- function(table, column){
+  table |> 
+    cols_merge(any_of(ends_with(column)),
+               pattern = "**{1}** ({4}, {5})<br>*{2} ±{3}*<br><span style = 'color:grey'>n={6}</span>")
 }

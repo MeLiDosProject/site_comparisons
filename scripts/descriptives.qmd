@@ -1,0 +1,59 @@
+---
+title: "Descriptives"
+subtitle: "Individual, behavioural, and environmental determinants of personal light exposure in daily life: a multi-country wearable and experience-sampling study"
+author: "Johannes Zauner"
+format: 
+  html:
+    toc: true
+    code-tools: true
+    code-link: true
+    page-layout: full
+---
+
+## Preface
+
+This document contains descriptive plots and tables of the dataset.
+
+## Setup
+
+```{r}
+#| message: false
+#| warning: false
+#| filename: Setup
+library(tidyverse)
+library(melidosData)
+library(LightLogR)
+library(gt)
+library(glue)
+library(rlang)
+library(gtsummary)
+source("helpers.R")
+source("table.R")
+```
+
+## Load data
+
+```{r}
+#| message: false
+load("../data/metrics_glasses.RData")
+load("../data/metrics_chest.RData")
+load("../data/preprocessed_glasses_1.RData")
+load("../data/preprocessed_chest_1.RData")
+load("../data/preprocessed_glasses_2.RData")
+load("../data/preprocessed_chest_2.RData")
+```
+
+## Table 2: Metric distribution
+
+```{r}
+light_table_all(metrics_glasses, "glasses")
+light_table_all(metrics_chest, "chest", skip = "MPI")
+```
+
+
+## Session Info
+
+```{r}
+sessionInfo()
+```
+
