@@ -178,7 +178,7 @@ light_summary_table <- function(data, site, table_name, skip = NULL) {
                   \(x) x |> str_to_title() |>  str_replace_all("_", " ")),
            Unit = c(
              rep(NA, 2),
-             rep("lx", 3),
+             rep("lx (rescaled from geometric mean)", 3),
              rep("HH:MM (time-of-day)", 9),
              rep("Hrs:Mins (duration)", 6),
              "klx·h",
