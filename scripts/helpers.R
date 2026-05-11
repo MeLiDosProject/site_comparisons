@@ -78,3 +78,8 @@ merge_desc_columns <- function(table, column){
     cols_merge(any_of(ends_with(column)),
                pattern = "**{1}** ({4}, {5})<br>*{2} ±{3}*<br><span style = 'color:grey'>n={6}</span>")
 }
+
+style_p_md <- function(x, sig.level = 0.05) {
+  x_styled <- style_pvalue(x, prepend_p = TRUE)
+  ifelse(x < sig.level, paste0("**", x_styled, "**"), x_styled)
+}

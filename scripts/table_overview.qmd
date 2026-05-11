@@ -1,5 +1,5 @@
 ---
-title: "Light Descriptives"
+title: "General Descriptives"
 subtitle: "Individual, behavioural, and environmental determinants of personal light exposure in daily life: a multi-country wearable and experience-sampling study"
 author: "Johannes Zauner"
 format: 
@@ -12,7 +12,7 @@ format:
 
 ## Preface
 
-This document contains descriptive plots and tables of the light data from the dataset.
+This document contains general descriptive plots and tables of the dataset.
 
 ## Setup
 
@@ -25,6 +25,7 @@ library(melidosData)
 library(LightLogR)
 library(gt)
 library(glue)
+library(here)
 library(rlang)
 library(gtsummary)
 source("helpers.R")
@@ -34,24 +35,22 @@ source("table.R")
 ## Load data
 
 ```{r}
-#| message: false
-load("../data/metrics_glasses.RData")
-load("../data/metrics_chest.RData")
-load("../data/preprocessed_glasses_1.RData")
-load("../data/preprocessed_chest_1.RData")
-load("../data/preprocessed_glasses_2.RData")
-load("../data/preprocessed_chest_2.RData")
+load(here("data/tbl1_data.RData"))
 ```
 
-## Table 2: Metric distribution
+## Table generation
 
 ```{r}
-light_table_all(metrics_glasses, "glasses")
-light_table_all(metrics_chest, "chest", skip = "MPI")
+general_table_all(tbl1_data)
 ```
-## Session Info
+
 
 ```{r}
-sessionInfo()
+
+```
+
+```{r}
+
+gtsave(tbl1, "tables/tbl1.png", vwidth = 1200)
 ```
 
